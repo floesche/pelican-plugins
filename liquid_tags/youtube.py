@@ -6,55 +6,45 @@ based on the jekyll / octopress youtube tag [1]_
 
 Syntax
 ------
-{% youtube id [width height] %}
+{% youtube id [aspect] %}
 
 Example
 -------
-{% youtube dQw4w9WgXcQ 640 480 %}
+{% youtube dQw4w9WgXcQ [16by9|4by4] %}
 
-Output
-------
-
-<span class="videobox">
-    <iframe
-        width="640" height="480" src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-        frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen>
-    </iframe>
-</span>
 
 [1] https://gist.github.com/jamieowen/2063748
 """
 import re
 from .mdx_liquid_tags import LiquidTags
 
-SYNTAX = "{% youtube id [width height] %}"
+SYNTAX = "{% youtube id [aspect_ratio] %}"
 
-YOUTUBE = re.compile(r'([\S]+)(\s+([\d%]+)\s([\d%]+))?')
+YOUTUBE = re.compile(r'([\S]+)(\s+([\S]+))?')
 
 
 @LiquidTags.register('youtube')
 def youtube(preprocessor, tag, markup):
-    width = 640
-    height = 390
+    aspect_ratio = '16by9'
     youtube_id = None
 
     match = YOUTUBE.search(markup)
     if match:
         groups = match.groups()
         youtube_id = groups[0]
-        width = groups[2] or width
-        height = groups[3] or height
+        aspect_ratio = groups[2] or aspect_ratio
 
     if youtube_id:
         youtube_out = """
-            <span class="videobox">
-                <iframe width="{width}" height="{height}"
-                    src='https://www.youtube.com/embed/{youtube_id}'
-                    frameborder='0' webkitAllowFullScreen mozallowfullscreen
+            <div class="embed-responsive embed-responsive-{aspect_ratio}">
+                <iframe 
+                    class="embed-responsive-item" 
+                    src="//www.youtube.com/embed/{youtube_id}" 
+                    webkitAllowFullScreen mozallowfullscreen
                     allowFullScreen>
                 </iframe>
-            </span>
-        """.format(width=width, height=height, youtube_id=youtube_id).strip()
+            </div>
+        """.format(aspect_ratio=aspect_ratio, youtube_id=youtube_id).strip()
     else:
         raise ValueError("Error processing input, "
                          "expected syntax: {0}".format(SYNTAX))
