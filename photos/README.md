@@ -11,6 +11,9 @@ The plug-in resizes the referred photos, and generates thumbnails for galleries 
 `PHOTO_LIBRARY = "~/Pictures"`
 :	Absolute path to the folder where the original photos are kept, organized in sub-folders.
 
+`PHOTO_OUTPUT_PATH = "photos"`
+: path where the resized photos are published, relative to `OUTPUT_PATH`
+
 `PHOTO_GALLERY = (1024, 768, 80)`
 :	For photos in galleries, maximum width and height, plus JPEG quality as a percentage. This would typically be the size of the photo displayed when the reader clicks a thumbnail.
 
@@ -52,10 +55,6 @@ The plug-in resizes the referred photos, and generates thumbnails for galleries 
 
 `PHOTO_EXIF_COPYRIGHT_AUTHOR = 'Your Name Here'`
 : Adds an author name to the photo's exif and copyright statement. Defaults to `AUTHOR` value from the `pelicanconf.py`
-
-The plug-in automatically resizes the photos and publishes them to the following output folder:
-
-    ./output/photos
 
 **WARNING:** The plug-in can take hours to resize 40,000 photos, therefore, photos and thumbnails are only generated once. Clean the output folders to regenerate the resized photos again.
 

@@ -61,6 +61,7 @@ def initialized(pelican):
     DEFAULT_CONFIG.setdefault('PHOTO_EXIF_COPYRIGHT_AUTHOR', DEFAULT_CONFIG['SITENAME'])
     DEFAULT_CONFIG.setdefault('PHOTO_LIGHTBOX_GALLERY_ATTR', 'data-lightbox')
     DEFAULT_CONFIG.setdefault('PHOTO_LIGHTBOX_CAPTION_ATTR', 'data-title')
+    DEFAULT_CONFIG.setdefault('PHOTO_OUTPUT_PATH', 'photos')
 
     DEFAULT_CONFIG['queue_resize'] = {}
     DEFAULT_CONFIG['created_galleries'] = {}
@@ -87,6 +88,7 @@ def initialized(pelican):
         pelican.settings.setdefault('PHOTO_EXIF_COPYRIGHT_AUTHOR', pelican.settings['AUTHOR'])
         pelican.settings.setdefault('PHOTO_LIGHTBOX_GALLERY_ATTR', 'data-lightbox')
         pelican.settings.setdefault('PHOTO_LIGHTBOX_CAPTION_ATTR', 'data-title')
+        pelican.settings.setdefault('PHOTO_OUTPUT_PATH', 'photos')
 
 
 def read_notes(filename, msg=None):
@@ -334,7 +336,7 @@ def detect_content(content):
                     photo_article = photo_prefix + 'a.jpg'
                     enqueue_resize(
                         path,
-                        os.path.join('photos', photo_article),
+                        os.path.join(settings['PHOTO_OUTPUT_PATH'], photo_article),
                         settings['PHOTO_ARTICLE']
                     )
 
@@ -345,7 +347,7 @@ def detect_content(content):
                         m.group('src'),
                         '=',
                         m.group('quote'),
-                        os.path.join(settings['SITEURL'], 'photos', photo_article),
+                        os.path.join(settings['SITEURL'], settings['PHOTO_OUTPUT_PATH'], photo_article),
                         m.group('quote'),
                         m.group('attrs_after'),
                     ))
@@ -354,14 +356,14 @@ def detect_content(content):
                     photo_gallery = photo_prefix + '.jpg'
                     enqueue_resize(
                         path,
-                        os.path.join('photos', photo_gallery),
+                        os.path.join(settings['PHOTO_OUTPUT_PATH'], photo_gallery),
                         settings['PHOTO_GALLERY']
                     )
 
                     photo_thumb = photo_prefix + 't.jpg'
                     enqueue_resize(
                         path,
-                        os.path.join('photos', photo_thumb),
+                        os.path.join(settings['PHOTO_OUTPUT_PATH'], photo_thumb),
                         settings['PHOTO_THUMB']
                     )
 
@@ -389,14 +391,14 @@ def detect_content(content):
                     output = ''.join((
                         '<a href=',
                         m.group('quote'),
-                        os.path.join(settings['SITEURL'], 'photos', photo_gallery),
+                        os.path.join(settings['SITEURL'], settings['PHOTO_OUTPUT_PATH'], photo_gallery),
                         m.group('quote'),
                         lightbox_attrs,
                         '><img',
                         m.group('attrs_before'),
                         'src=',
                         m.group('quote'),
-                        os.path.join(settings['SITEURL'], 'photos', photo_thumb),
+                        os.path.join(settings['SITEURL'], settings['PHOTO_OUTPUT_PATH'], photo_thumb),
                         m.group('quote'),
                         m.group('attrs_after'),
                         '</a>'
@@ -470,8 +472,8 @@ def process_gallery(generator, content, location):
 
         if os.path.isdir(dir_gallery):
             logger.info('photos: Gallery detected: {}'.format(rel_gallery))
-            dir_photo = os.path.join('photos', rel_gallery.lower())
-            dir_thumb = os.path.join('photos', rel_gallery.lower())
+            dir_photo = os.path.join(generator.settings['PHOTO_OUTPUT_PATH'], rel_gallery.lower())
+            dir_thumb = os.path.join(generator.settings['PHOTO_OUTPUT_PATH'], rel_gallery.lower())
             exifs = read_notes(os.path.join(dir_gallery, 'exif.txt'),
                                msg='photos: No EXIF for gallery')
             captions = read_notes(os.path.join(dir_gallery, 'captions.txt'), msg='photos: No captions for gallery')
@@ -542,15 +544,15 @@ def process_image(generator, content, image):
         thumb = os.path.splitext(image)[0].lower() + 't.jpg'
         content.photo_image = (
             os.path.basename(image).lower(),
-            os.path.join('photos', photo),
-            os.path.join('photos', thumb))
+            os.path.join(generator.settings['PHOTO_OUTPUT_PATH'], photo),
+            os.path.join(generator.settings['PHOTO_OUTPUT_PATH'], thumb))
         enqueue_resize(
             path,
-            os.path.join('photos', photo),
+            os.path.join(generator.settings['PHOTO_OUTPUT_PATH'], photo),
             generator.settings['PHOTO_ARTICLE'])
         enqueue_resize(
             path,
-            os.path.join('photos', thumb),
+            os.path.join(generator.settings['PHOTO_OUTPUT_PATH'], thumb),
             generator.settings['PHOTO_THUMB'])
     else:
         logger.error('photo: No photo for {} at {}'.format(content.source_path, path))
